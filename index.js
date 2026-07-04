@@ -61,6 +61,30 @@ app.command("/coaxnova-joke", async ({ ack, respond }) => {
     }
 });
 
+// Array of interesting space facts
+const spaceFacts = [
+  "One day on Venus is longer than one entire year on Venus.",
+  "Neutron stars are so dense that a single teaspoon of their material would weigh about 6 billion tons.",
+  "Space is completely silent because there is no atmosphere for sound waves to travel through.",
+  "Footprints left by astronauts on the Moon will probably stay there for at least 100 million years.",
+  "The sun makes up 99.86% of all the mass in our entire solar system."
+];
+
+// Handle the /coaxnova-space command
+app.command("/coaxnova-space", async ({ ack, respond }) => {
+  await ack();
+  try {
+    // Pick a random fact from our array
+    const randomFact = spaceFacts[Math.floor(Math.random() * spaceFacts.length)];
+    
+    await respond({
+      text: `🌌 *Space Fact:* ${randomFact}`
+    });
+  } catch (error) {
+    console.error('Error handling /coaxnova-space:', error);
+    await respond({ text: "🚀 Failed to launch space fact. Try again later!" });
+  }
+});
 
 // Start your app
 (async () => {
