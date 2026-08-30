@@ -72,22 +72,31 @@ const spaceFacts = [
 
 // Handle the /coaxnova-space command
 app.command("/coaxnova-space", async ({ ack, respond }) => {
+  // 1. Instantly acknowledge the command to clear the 3-second rule
   await ack();
+
   try {
-    // Pick a random fact from our array
+    // 2. Run your array logic safely
     const randomFact = spaceFacts[Math.floor(Math.random() * spaceFacts.length)];
     
     await respond({
-      text: `🌌 *Space Fact:* ${randomFact}`
+      text: `*Space Fact:* ${randomFact}`
     });
   } catch (error) {
     console.error('Error handling /coaxnova-space:', error);
-    await respond({ text: "🚀 Failed to launch space fact. Try again later!" });
+    await respond({ text: "Failed to launch space fact. Try again later!" });
   }
+});
+
+
+// Listens to absolutely any message typed in the channel
+// Cleaned message listener
+app.message('hello', async ({ message, say }) => {
+  await say(`Hey there <@${message.user}>!`);
 });
 
 // Start your app
 (async () => {
-    await app.start(process.env.PORT || 3000);
-    console.log('⚡ CoaxNova Bolt app is running!');
+  await app.start(process.env.PORT || 3000);
+  console.log('⚡️ CoaxNova Bolt app is running!');
 })();
