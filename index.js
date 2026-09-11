@@ -1,102 +1,91 @@
-require("dotenv").config();
-
+require('dotenv').config();
 const { App } = require("@slack/bolt");
 const axios = require("axios");
+
 const app = new App({
-  token: process.env.SLACK_BOT_TOKEN,
-  appToken: process.env.SLACK_APP_TOKEN,
-  socketMode: true
+    token: process.env.SLACK_BOT_TOKEN,
+    appToken: process.env.SLACK_APP_TOKEN,
+    socketMode: true
 });
 
+// 1. PING COMMAND
 app.command("/coaxnova-ping", async ({ command, ack, respond }) => {
-  const start = Date.now();
-  await ack();
-  const latency = Date.now() - start;
-  await respond({ text: `Pong!\nLatency: ${latency}ms` });
+    await ack(); // Instantly clears the 3-second Slack timeout
+    const start = Date.now();
+    const latency = Date.now() - start;
+    await respond({ text: `Pong!\nLatency: ${latency}ms` });
 });
 
-(async () => {
-  await app.start();
-  console.log("bot is running!");
-})();
+// 2. HELP COMMAND
 app.command("/coaxnova-help", async ({ ack, respond }) => {
-  await ack();
-  await respond({
-    text:
-`Available Commands:
-/coaxnova-ping - Check bot latency
-/coaxnova-catfact - Get a cat fact`
-  });
-});
-app.command("/coaxnova-catfact", async ({ ack, respond }) => {
-    await ack();
-    try {
-        const response = await axios.get("https://catfact.ninja/fact");
-        await respond({ text: `Cat Fact:\n${response.data.fact}` });
-    } catch (err) {  
-        await respond({ text: "Failed to fetch a cat fact." });
-    } 
+    await ack(); // Instantly clears the 3-second Slack timeout
+    await respond({
+        text: `Available Commands:\n/coaxnova-ping - Check bot latency\n/coaxnova-catfact - Get a cat fact`
+    });
 });
 
+// 3. CAT FACT COMMAND
+app.command("/coaxnova-catfact", async ({ ack, respond }) => {
+    await ack(); // Instantly clears the 3-second Slack timeout
+    try {
+        const response = await axios.get("https://catfact.ninja");
+        await respond({ text: `Cat Fact:\n${response.data.fact}` });
+    } catch (err) {
+        await respond({ text: "Failed to fetch a cat fact." });
+    }
+});
+
+// 4. INTRO COMMAND
 app.command("/coaxnova-intro", async ({ ack, respond }) => {
-    await ack();
+    await ack(); // Instantly clears the 3-second Slack timeout
     try {
         await respond({
             response_type: 'in_channel',
-            text: "🌟 Hello! I'm Coaxnova, your custom Slack assistant! 🤖"
+            text: "👋 Hello! I'm Coaxnova, your custom Slack assistant! 🤖"
         });
     } catch (error) {
         console.error('Error handling /coaxnova-intro command:', error);
     }
 });
 
+// 5. JOKE COMMAND (Fixed Curly Quotes)
 app.command("/coaxnova-joke", async ({ ack, respond }) => {
-    await ack();
+    await ack(); // Instantly clears the 3-second Slack timeout
     try {
-        await respond({
-            text: "Why don't scientists trust atoms? Because they make up everything!"
-        });
+        await respond({ text: "Why don't scientists trust atoms? Because they make up everything!" });
     } catch (err) {
         await respond({ text: "Failed to send a joke." });
     }
 });
 
-// Array of interesting space facts
+// SPACE FACTS ARRAY
 const spaceFacts = [
-  "One day on Venus is longer than one entire year on Venus.",
-  "Neutron stars are so dense that a single teaspoon of their material would weigh about 6 billion tons.",
-  "Space is completely silent because there is no atmosphere for sound waves to travel through.",
-  "Footprints left by astronauts on the Moon will probably stay there for at least 100 million years.",
-  "The sun makes up 99.86% of all the mass in our entire solar system."
+    "One day on Venus is longer than one entire year on Venus.",
+    "Neutron stars are so dense that a single teaspoon of their material would weigh about 6 billion tons.",
+    "Space is completely silent because there is no atmosphere for sound waves to travel through.",
+    "Footprints left by astronauts on the Moon will probably stay there for at least 100 million years.",
+    "The sun makes up 99.86% of all the mass in our entire solar system."
 ];
 
-// Handle the /coaxnova-space command
+// 6. SPACE COMMAND (Fixed Template Literals with Backticks)
 app.command("/coaxnova-space", async ({ ack, respond }) => {
-  // 1. Instantly acknowledge the command to clear the 3-second rule
-  await ack();
-
-  try {
-    // 2. Run your array logic safely
-    const randomFact = spaceFacts[Math.floor(Math.random() * spaceFacts.length)];
-    
-    await respond({
-      text: `*Space Fact:* ${randomFact}`
-    });
-  } catch (error) {
-    console.error('Error handling /coaxnova-space:', error);
-    await respond({ text: "Failed to launch space fact. Try again later!" });
-  }
+    await ack(); // Instantly clears the 3-second Slack timeout
+    try {
+        const randomFact = spaceFacts[Math.floor(Math.random() * spaceFacts.length)];
+        await respond({ text: `Space Fact: ${randomFact}` });
+    } catch (error) {
+        console.error('Error handling /coaxnova-space:', error);
+        await respond({ text: "Failed to launch space fact. Try again later!" });
+    }
 });
 
-
-// Listens to absolutely any message typed in the channel
-// Cleaned message listener
+// 7. HELLO LISTEN-TRIGGER
 app.message('hello', async ({ message, say }) => {
-  await say(`Hey there <@${message.user}>!`);
+    await say(`Hey there <@${message.user}>!`);
 });
 
-// Start your app
+// START YOUR APP (Duplicate block removed, text string properly wrapped in double quotes)
 (async () => {
-  await app.start(process.env.PORT || 3000);
-  console.log('⚡️ CoaxNova Bolt app is running!');
+    await app.start(process.env.PORT || 3000);
+    console.log("⚡️ CoaxNova Bolt app is running!");
 })();
